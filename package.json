@@ -1,6 +1,6 @@
 {
   "name": "@huds0n/expo-cache-image",
-  "version": "1.5.0-beta.8",
+  "version": "1.5.0-beta.9",
   "description": "Substitue for Image with enhanced caching ability",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -20,9 +20,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@huds0n/core": "1.5.0-beta.8",
-    "@huds0n/error": "1.5.0-beta.8",
-    "@huds0n/utilities": "1.5.0-beta.8",
+    "@huds0n/core": "1.5.0-beta.9",
+    "@huds0n/error": "1.5.0-beta.9",
+    "@huds0n/utilities": "1.5.0-beta.9",
     "expo-blur": "^8.2.0",
     "expo-file-system": "^9.2.0",
     "react": "16.13.1",
