@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 
-import { Core } from '@huds0n/core';
 import Error from '@huds0n/error';
+import { theme } from '@huds0n/theming/src/theme';
 import {
   useAnimatedValue,
   useAsyncCallback,
@@ -37,7 +37,7 @@ const imageFill: ImageStyle = {
 
 export default function CacheImageComponent(props: Types.Props) {
   const {
-    activityIndicatorColor = Core.colors.TEXT,
+    activityIndicatorColor = theme.colors.TEXT,
     activityIndicatorSize = 'large',
     errorPlaceholderImage = defaultErrorPlaceholder,
     fadeDuration = 300,
@@ -85,7 +85,7 @@ export default function CacheImageComponent(props: Types.Props) {
     outputRange: [1, 0],
   });
 
-  const flattenedStyle = StyleSheet.flatten(style);
+  const flattenedStyle = StyleSheet.flatten(style) || {};
 
   const borderRadiusStyle = {
     borderRadius: flattenedStyle.borderRadius,
