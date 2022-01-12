@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -8,37 +8,37 @@ import {
   ImageStyle,
   StyleSheet,
   View,
-} from 'react-native';
-import { BlurView } from 'expo-blur';
+} from "react-native";
+import { BlurView } from "expo-blur";
 
-import Error from '@huds0n/error';
-import { theme } from '@huds0n/theming/src/theme';
+import Error from "@huds0n/error";
+import { theme } from "@huds0n/theming/src/theme";
 import {
   useAnimatedValue,
   useAsyncCallback,
   useCallback,
   useEffect,
   useState,
-} from '@huds0n/utilities';
+} from "@huds0n/utilities";
 
-import Cache from './Cache';
-import * as Types from './types';
+import Cache from "./Cache";
+import type { Types } from "./types";
 
-const defaultPlaceholder = require('../assets/noImagePlaceholder.png');
-const defaultErrorPlaceholder = require('../assets/errorImagePlaceholder.png');
+const defaultPlaceholder = require("../assets/noImagePlaceholder.png");
+const defaultErrorPlaceholder = require("../assets/errorImagePlaceholder.png");
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
 const imageFill: ImageStyle = {
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
+  position: "absolute",
+  width: "100%",
+  height: "100%",
 };
 
 export default function CacheImageComponent(props: Types.Props) {
   const {
     activityIndicatorColor = theme.colors.TEXT,
-    activityIndicatorSize = 'large',
+    activityIndicatorSize = "large",
     errorPlaceholderImage = defaultErrorPlaceholder,
     fadeDuration = 300,
     placeholderImage = defaultPlaceholder,
@@ -57,14 +57,14 @@ export default function CacheImageComponent(props: Types.Props) {
   const [load, isLoading] = useAsyncCallback(
     async (source: ImageURISource | null) => {
       setLoadedSource(source ? await Cache.load(source) : null);
-    },
+    }
   );
 
   const fadeIn = useCallback(() => {
     Animated.timing(intensity, {
       duration: fadeDuration,
       toValue: 0,
-      useNativeDriver: Platform.OS === 'android',
+      useNativeDriver: Platform.OS === "android",
     }).start();
   });
 
@@ -77,7 +77,7 @@ export default function CacheImageComponent(props: Types.Props) {
       fadeIn();
     },
     [loadedSource],
-    { skipMounts: true },
+    { skipMounts: true }
   );
 
   const opacity = intensity.interpolate({
@@ -134,11 +134,11 @@ export default function CacheImageComponent(props: Types.Props) {
   })();
 
   return (
-    <View style={StyleSheet.flatten([{ overflow: 'hidden' }, flattenedStyle])}>
+    <View style={StyleSheet.flatten([{ overflow: "hidden" }, flattenedStyle])}>
       <Animated.View style={[StyleSheet.absoluteFill, { opacity }]}>
         {image}
 
-        {Platform.OS === 'ios' && (
+        {Platform.OS === "ios" && (
           <AnimatedBlurView
             // @ts-ignore
             style={StyleSheet.absoluteFill}
@@ -151,7 +151,7 @@ export default function CacheImageComponent(props: Types.Props) {
         <View
           style={[
             StyleSheet.absoluteFill,
-            { alignContent: 'center', justifyContent: 'center' },
+            { alignContent: "center", justifyContent: "center" },
           ]}
         >
           <ActivityIndicator

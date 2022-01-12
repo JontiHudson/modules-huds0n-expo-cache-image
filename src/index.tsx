@@ -1,13 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import Cache from './Cache';
-import CacheImageComponent from './Component';
+import Cache from "./Cache";
+import CacheImageComponent from "./Component";
 
-import * as Types from './types';
-
-export namespace CacheImage {
-  export type Props = Types.Props;
-}
+import type { Types } from "./types";
 
 export class CacheImage extends React.Component<Types.Props> {
   static clear = Cache.clear;
@@ -17,3 +13,5 @@ export class CacheImage extends React.Component<Types.Props> {
     return <CacheImageComponent {...this.props} />;
   }
 }
+
+export type { Types as CacheImageTypes } from "./types";
