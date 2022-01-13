@@ -20,9 +20,9 @@ function CacheImageComponent(props) {
     const { activityIndicatorColor = theme_1.theme.colors.TEXT, activityIndicatorSize = "large", errorPlaceholderImage = defaultErrorPlaceholder, fadeDuration = 300, placeholderImage = defaultPlaceholder, resizeMethod, resizeMode, source: sourceProp, style, } = props;
     const intensity = (0, utilities_1.useAnimatedValue)(100);
     const [loadedSource, setLoadedSource] = (0, utilities_1.useState)(undefined);
-    const [load, isLoading] = (0, utilities_1.useAsyncCallback)((source) => (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
-        setLoadedSource(source ? yield Cache_1.default.load(source) : null);
-    }));
+    const [load, isLoading] = (0, utilities_1.useAsyncCallback)(async (source) => {
+        setLoadedSource(source ? await Cache_1.default.load(source) : null);
+    });
     const fadeIn = (0, utilities_1.useCallback)(() => {
         react_native_1.Animated.timing(intensity, {
             duration: fadeDuration,

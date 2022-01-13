@@ -8,6 +8,11 @@ const error_1 = (0, tslib_1.__importDefault)(require("@huds0n/error"));
 const FS_DIR = `${FileSystem.cacheDirectory}@huds0n-cache-image/`;
 const FS_DIR_TEMP = `${FileSystem.cacheDirectory}@huds0n-cache-image-temp/`;
 class ImageCacheNativeClass {
+    _cache;
+    _tempId;
+    _buildingDirs;
+    _fsDir;
+    _fsDirTemp;
     constructor(fsDir, fsDirTemp) {
         this._cache = {};
         this._fsDir = fsDir;
@@ -21,59 +26,51 @@ class ImageCacheNativeClass {
         this.clear = this.clear.bind(this);
         this.load = this.load.bind(this);
     }
-    clear() {
-        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
-            this._cache = {};
-            this._tempId = 0;
-            const rebuildDir = (dir) => (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
-                try {
-                    yield FileSystem.deleteAsync(dir, { idempotent: true });
-                }
-                catch (_a) { }
-                yield FileSystem.makeDirectoryAsync(dir);
-            });
-            yield this._buildingDirs;
-            this._buildingDirs = Promise.all([
-                rebuildDir(this._fsDir),
-                rebuildDir(this._fsDirTemp),
-            ]);
-            yield this._buildingDirs;
-        });
-    }
-    load(source) {
-        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
+    async clear() {
+        this._cache = {};
+        this._tempId = 0;
+        const rebuildDir = async (dir) => {
             try {
-                return this._loadSource(source);
+                await FileSystem.deleteAsync(dir, { idempotent: true });
             }
-            catch (error) {
-                throw error_1.default.transform(error, {
-                    name: 'Huds0n Error',
-                    code: 'CACHE_IMAGE_UNKNOWN_ERROR',
-                    message: 'Cache failed',
-                    info: { source },
-                    severity: 'MEDIUM',
-                });
-            }
-        });
+            catch { }
+            await FileSystem.makeDirectoryAsync(dir);
+        };
+        await this._buildingDirs;
+        this._buildingDirs = Promise.all([
+            rebuildDir(this._fsDir),
+            rebuildDir(this._fsDirTemp),
+        ]);
+        await this._buildingDirs;
     }
-    static _moveFromTemp(temp, path) {
-        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
-            yield FileSystem.moveAsync({ from: temp, to: path });
-        });
+    async load(source) {
+        try {
+            return this._loadSource(source);
+        }
+        catch (error) {
+            throw error_1.default.transform(error, {
+                name: 'Huds0n Error',
+                code: 'CACHE_IMAGE_UNKNOWN_ERROR',
+                message: 'Cache failed',
+                info: { source },
+                severity: 'MEDIUM',
+            });
+        }
     }
-    static _downloadToTemp(uri, temp) {
-        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
-            const outcome = yield FileSystem.downloadAsync(uri, temp).catch(() => { });
-            if (!outcome || outcome.status !== 200) {
-                throw new error_1.default({
-                    name: 'Huds0n Error',
-                    code: 'CACHE_IMAGE_DOWNLOAD_ERROR',
-                    message: 'Unable to download image',
-                    info: { downloadError: outcome },
-                    severity: 'LOW',
-                });
-            }
-        });
+    static async _moveFromTemp(temp, path) {
+        await FileSystem.moveAsync({ from: temp, to: path });
+    }
+    static async _downloadToTemp(uri, temp) {
+        const outcome = await FileSystem.downloadAsync(uri, temp).catch(() => { });
+        if (!outcome || outcome.status !== 200) {
+            throw new error_1.default({
+                name: 'Huds0n Error',
+                code: 'CACHE_IMAGE_DOWNLOAD_ERROR',
+                message: 'Unable to download image',
+                info: { downloadError: outcome },
+                severity: 'LOW',
+            });
+        }
     }
     static _getFilenameExtension(uri) {
         const filename = uri.substring(uri.lastIndexOf('/'), uri.indexOf('?') === -1 ? uri.length : uri.indexOf('?'));
@@ -82,24 +79,20 @@ class ImageCacheNativeClass {
             : filename.substring(filename.lastIndexOf('.'));
     }
     static sourceToUri(source) {
-        return (source === null || source === void 0 ? void 0 : source.uri) || null;
+        return source?.uri || null;
     }
-    static _storedPathExists(path) {
-        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
-            const { exists } = yield FileSystem.getInfoAsync(path);
-            return exists;
-        });
+    static async _storedPathExists(path) {
+        const { exists } = await FileSystem.getInfoAsync(path);
+        return exists;
     }
     static uriToSource(uri) {
         return { uri };
     }
-    _loadSource(source) {
-        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
-            const uri = ImageCacheNativeClass.sourceToUri(source);
-            return uri
-                ? ImageCacheNativeClass.uriToSource(yield this._getCachedUri(uri))
-                : null;
-        });
+    async _loadSource(source) {
+        const uri = ImageCacheNativeClass.sourceToUri(source);
+        return uri
+            ? ImageCacheNativeClass.uriToSource(await this._getCachedUri(uri))
+            : null;
     }
     _getCachedUri(uri) {
         return this._getUriFromCache(uri) || this._pullCachedUri(uri);
@@ -107,22 +100,20 @@ class ImageCacheNativeClass {
     _getUriFromCache(uri) {
         return this._cache[uri];
     }
-    _pullCachedUri(uri) {
-        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
-            const { path, temp } = this._getPaths(uri);
-            yield this._buildingDirs;
-            if (!(yield ImageCacheNativeClass._storedPathExists(path))) {
-                if (uri.startsWith('file')) {
-                    yield FileSystem.copyAsync({ from: uri, to: path });
-                }
-                else {
-                    yield ImageCacheNativeClass._downloadToTemp(uri, temp);
-                    yield ImageCacheNativeClass._moveFromTemp(temp, path);
-                }
+    async _pullCachedUri(uri) {
+        const { path, temp } = this._getPaths(uri);
+        await this._buildingDirs;
+        if (!(await ImageCacheNativeClass._storedPathExists(path))) {
+            if (uri.startsWith('file')) {
+                await FileSystem.copyAsync({ from: uri, to: path });
             }
-            this._addPathToCache(uri, path);
-            return path;
-        });
+            else {
+                await ImageCacheNativeClass._downloadToTemp(uri, temp);
+                await ImageCacheNativeClass._moveFromTemp(temp, path);
+            }
+        }
+        this._addPathToCache(uri, path);
+        return path;
     }
     _getPaths(uri) {
         const ext = ImageCacheNativeClass._getFilenameExtension(uri);
