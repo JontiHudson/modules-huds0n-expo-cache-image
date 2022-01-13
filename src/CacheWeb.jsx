@@ -8,20 +8,24 @@ class ImageCacheWebClass {
         this.clear = this.clear.bind(this);
         this.load = this.load.bind(this);
     }
-    async clear() { }
-    async load(source) {
-        try {
-            return source;
-        }
-        catch (error) {
-            throw error_1.default.transform(error, {
-                name: 'Huds0n Error',
-                code: 'CACHE_IMAGE_UNKNOWN_ERROR',
-                message: 'Cache failed',
-                info: { source },
-                severity: 'MEDIUM',
-            });
-        }
+    clear() {
+        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () { });
+    }
+    load(source) {
+        return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
+            try {
+                return source;
+            }
+            catch (error) {
+                throw error_1.default.transform(error, {
+                    name: 'Huds0n Error',
+                    code: 'CACHE_IMAGE_UNKNOWN_ERROR',
+                    message: 'Cache failed',
+                    info: { source },
+                    severity: 'MEDIUM',
+                });
+            }
+        });
     }
 }
 exports.ImageCacheWeb = new ImageCacheWebClass();
